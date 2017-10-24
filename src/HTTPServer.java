@@ -41,12 +41,12 @@ public class HTTPServer {
 					System.out.println("Client says: "+line);
 				}
 				
-				String testString = new TCPClient(host).doRequest();
+				String htmlContent = new TCPClient(host).getLeetHTML();
 				
 				toClient.write("HTTP/1.0 200 OK\r\n");
-				toClient.write("Content-length: "+testString.length()+"\r\n");
+				toClient.write("Content-length: "+htmlContent.length()+"\r\n");
 				toClient.write("\r\n");
-				toClient.write(testString);
+				toClient.write(htmlContent);
 				toClient.flush();
 			}
 			

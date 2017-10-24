@@ -16,7 +16,7 @@ public class TCPClient {
 		this.host = host;
 	}
 	
-	public String doRequest(){
+	public String getLeetHTML(){
 		String result = "";
 		try(Socket s=new Socket(host, 80);
 				BufferedWriter toServer = 
@@ -37,7 +37,7 @@ public class TCPClient {
 					line = fromServer.readLine()){
 
 
-				System.out.println(line);
+			//	System.out.println(line);
 				if(line.length()<4){
 					headFinished = true;
 				}
