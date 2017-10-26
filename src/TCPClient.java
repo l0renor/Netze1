@@ -16,7 +16,7 @@ public class TCPClient {
 		this.host = host;
 	}
 	
-	public String getLeetHTML(){
+	public String getLeetHTML(String get){
 		String result = "";
 		try(Socket s=new Socket(host, 80);
 				BufferedWriter toServer = 

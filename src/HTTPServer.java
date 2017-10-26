@@ -41,14 +41,30 @@ public class HTTPServer {
 					System.out.println("Client says: "+line);
 				}
 				
-				String htmlContent = new TCPClient(host).getLeetHTML();
+				String htmlContent = new TCPClient(host).getLeetHTML("GET /index.html HTTP/1.0");
 				
-				toClient.write("HTTP/1.0 200 OK\r\n");
-				toClient.write("Content-length: "+htmlContent.length()+"\r\n");
-				toClient.write("\r\n");
-				toClient.write(htmlContent);
-				toClient.flush();
+//				toClient.write("HTTP/1.0 200 OK\r\n");
+//				toClient.write("Connection: keep-alive\r\n");
+//                toClient.write("Content-length: "+htmlContent.length()+"\r\n");
+//				toClient.write("\r\n");
+//				toClient.write(htmlContent);
+//				toClient.flush();
+				while (true) {
+                    System.out.println("---------------------------------------");
+					for (String line = fromClient.readLine();
+						 line != null && line.length() > 0;
+						 line = fromClient.readLine()) {
+						System.out.println("Client says: " + line);
+
+					}
+					String out = "Hello";
+                    toClient.write("HTTP/1.0 400: Bad Request\r\n");
+                    toClient.write("Connection: keep-alive\r\n");
+                    toClient.write("\r\n");
+				}
 			}
+
+
 			
 		} catch (IOException e) {
 
