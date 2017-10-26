@@ -1,6 +1,6 @@
 
 
-public class RegexKontroller {
+public class RegexController {
 
 
 

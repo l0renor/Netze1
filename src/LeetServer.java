@@ -1,127 +1,68 @@
 import java.io.*;
-import java.net.ServerSocket;
-import java.net.Socket;
-import java.util.concurrent.TimeUnit;
+import java.net.*;
+import java.util.Scanner;
+import org.jsoup.Jsoup;
+import org.jsoup.UnsupportedMimeTypeException;
+import org.jsoup.nodes.Document;
 
 public class LeetServer {
-
+    public static final int PORT = 8082;
 
     public static void main(String[] args) {
         LeetServer server = new LeetServer();
-        server.startServer(args[0]);
+        // server.startServer(args[0]);
+        server.startServer("mmix.cs.hm.edu");
 
     }
+
     private void startServer(String host) {
 
-        try(ServerSocket servSock = new ServerSocket(8082)) {
-
+        try (ServerSocket servSock = new ServerSocket(PORT)) {
             System.out.println("Server started, waiting for clients...");
-
-            try (Socket server = servSock.accept();
+            while(true){
+            try (Socket s = servSock.accept();
                  BufferedReader fromClient =
                          new BufferedReader(
-                                 new InputStreamReader(server.getInputStream()));
+                                 new InputStreamReader(s.getInputStream()));
                  BufferedWriter toClient =
                          new BufferedWriter(
-                                 new OutputStreamWriter(server.getOutputStream()));
-                 Socket s = new Socket(host, 80);
-                 BufferedWriter toServer =
-                         new BufferedWriter(
-                                 new OutputStreamWriter(
-                                         s.getOutputStream()));
-                 BufferedReader fromServer =
-                         new BufferedReader(
-                                 new InputStreamReader(
-                                         s.getInputStream()))) {
-
-
-
-
+                                 new OutputStreamWriter(s.getOutputStream()))) {
                 System.out.println("Got client connection!");
 
-                while(true) {
-                   // System.out.println("oben");
-                   // String clientResponse = "";
-                    boolean flush = false;
-                    for (String line = fromClient.readLine();
-                         line != null && line.length() > 0;
-                         line = fromClient.readLine()) {
+                String resource;
 
-                        System.out.println("Client says: " + line);
-                        if (line.equals("Host: localhost:8082")) {
-                            line = "Host: " + host;
-                            System.out.println(line);
-                        }
-                        if(!line.contains("Accept-Encoding")) {
-                            toServer.write(line);
-                            toServer.write("\r\n");
-                        }
-                        flush = true;
-                    }
-                    if(flush) {
-                        toServer.write("\r\n");
-                        toServer.flush();
-                        System.out.println("toServer");
-                    }
+                do{
+                    resource = fromClient.readLine();
+                }while (!resource.contains("GET"));
 
-                    flush = false;
-                    for (String line = fromServer.readLine();
-                         line != null;
-                         line = fromServer.readLine()) {
-                        System.out.println(line);
-                        if (line.equals("Host: localhost:8082")) {
-                            line = "Host: " + host;
-                            System.out.println(line);
-                        }
-//                        if (line.equals("Connection: close")) {
-//                            line = "Connection: keep-alive";
-//                            System.out.println(line);
-//                            System.out.println("-----------------------");
-//                        }
-                        toClient.write(line);
-                        toClient.write("\r\n");
-                        flush = true;
+                String url = "http://" + host + resource.split(" ")[1];
+                System.out.println(url);
 
-
-                    }
-                    if(flush) {
-                        toClient.write("\r\n");
-                        toClient.flush();
-                        System.out.println("toCLient");
-                    }
+                Document doc;
+                try {
+                    doc = Jsoup.connect(url).get();
+                }catch (UnsupportedMimeTypeException e) {
+                    s.close();
+                    continue;
                 }
-                    /*
-                    System.out.println("-------------------------------------");
-                    while (true){
-                        String tmp = fromClient.readLine();
-                        System.out.println("AA"+tmp);
 
-                        toServer.write(tmp);
-                        toServer.write("Host: "+host+"\r\n");
-                        toServer.write("\r\n");
-                        toServer.flush();
-                        TimeUnit.SECONDS.sleep(1);
-                        result = "";
-                        System.out.println(fromServer.readLine());
-                        for (String line = fromServer.readLine();
-                             line != null *//*&& line.length()>0*//*;
-                             line = fromServer.readLine()) {
-                            System.out.println(line);
-                            result+= line;
-                            result+="\r\n";
-                            System.out.println("-----a----");
-                        }
-                        toClient.write(result);
-                        toClient.flush();*/
+                String html = doc.html();
+                html = RegexController.toLeet(html);
+                System.out.println(html);
+                toClient.write("HTTP/1.1 200 OK\r\n");
+                toClient.write("Content-Type: text/html\r\n");
+                toClient.write("Connection: close\r\n");
+                toClient.write("\r\n");
+                toClient.write(html);
+                toClient.flush();
 
-                //}
+
+                }
 
             }
-        }catch (Exception e) {
 
+        } catch (IOException e) {
             e.printStackTrace();
         }
-
     }
-
 }
