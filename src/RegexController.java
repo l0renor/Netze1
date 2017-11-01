@@ -6,11 +6,12 @@ public class RegexController {
 
 
     /**
-     * Adds Leetspeak and Image Tags
+     * Adds Leetspeak and replaces the Image sources with the HM-logo
      * @param in Text to modify
-     * @return text
+     * @return modiefyed text
      */
     public static String toLeet(String in){
+      //add leet
       in =  in.replaceAll("MMIX","MM!}{");
       in =  in.replaceAll("Java","J4v4");
       in =  in.replaceAll("Computer","(om|Du7er");
@@ -23,6 +24,7 @@ public class RegexController {
       in =   in.replaceAll("Studierende","5tud!r3nd3");
       in =   in.replaceAll("Windows","W!n|)ows");
       in =   in.replaceAll("Linux","|_inu><");
+      //add image sources
       in =   in.replaceAll("<img.*>","<img src = \"https://upload.wikimedia.org/wikipedia/de/thumb/e/e8/Hochschule_Muenchen_Logo.svg/200px-Hochschule_Muenchen_Logo.svg.png\"  height=\"100\" width=\"200\">");
 
       return in;
